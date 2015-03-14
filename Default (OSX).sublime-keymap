@@ -1,0 +1,3 @@
+[
+  { "keys": ["super+alt+tab"], "command": "emacs_tabstops_toggle" }
+]

@@ -1,3 +1,4 @@
 [
-  { "caption": "EmacsTabstops: Toggle Tabs/Spaces", "command": "emacs_tabstops_toggle" }
+  { "caption": "EmacsTabstops: Toggle Tabs/Spaces", "command": "emacs_tabstops_toggle" },
+  { "caption": "EmacsTabstops: Tabs -> Spaces", "command": "emacs_tabstops_to_spaces" },
 ]

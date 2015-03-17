@@ -1,3 +1,4 @@
 [
-  { "keys": ["super+alt+tab"], "command": "emacs_tabstops_toggle" }
+  { "keys": ["super+alt+tab"], "command": "emacs_tabstops_toggle" },
+  { "keys": ["super+alt+shift+tab"], "command": "emacs_tabstops_to_spaces" }
 ]

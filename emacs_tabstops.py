@@ -133,7 +133,7 @@ class FriendlyTextCommand(sublime_plugin.TextCommand):
     def run(self, edit, *args, **kwargs):
         try:
             ret = self._friendly_run(edit, *args, **kwargs)
-            if self._success_message:
+            if self._success_msg:
                 sublime.status_message(self._success_msg)
             return ret
         except:
@@ -201,6 +201,36 @@ class EmacsTabstopsToggle(sublime_plugin.TextCommand):
             pass
 
         return None
+
+
+class EmacsTabstopsSave(sublime_plugin.TextCommand):
+    def _save(self):
+        self.view.settings().erase(S_CONVERTED_TO)
+        self.view.run_command("save")
+
+        if self.view.settings().get(S_SCRATCH_HACK, None):
+            self.view.set_scratch(False)
+            self.view.settings().erase(S_SCRATCH_HACK)
+            # self.try_to_remove_handler(S_SCRATCH_HACK, "on_modified")
+            _scratch_listener.try_to_remove_handler(S_SCRATCH_HACK,
+                                                    "on_modified")
+        if self.view.settings().get(S_RESET_HACK, None):
+            self.view.settings().erase(S_RESET_HACK)
+            # self.remove_handler("on_modified")
+            _reset_listener.remove_handler(S_RESET_HACK, "on_modified")
+        erase_state(self.view.settings())
+
+
+class EmacsTabstopsSaveWithSpaces(EmacsTabstopsSave):
+    def run(self, edit):
+        self.view.run_command("emacs_tabstops_to_spaces")
+        self._save()
+
+
+class EmacsTabstopsSaveWithTabs(EmacsTabstopsSave):
+    def run(self, edit):
+        self.view.run_command("emacs_tabstops_to_tabs")
+        self._save()
 
 
 class DynamicListener(sublime_plugin.EventListener):

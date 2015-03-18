@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Plugin for dealing with Emacs-style tabstops"""
 
+import os
+from fnmatch import fnmatch
+
 import sublime
 import sublime_plugin
 
@@ -19,7 +22,8 @@ S_TTS_ON_ACTIVATE = PREFIX + "_tts_on_activate"  # run tabs to spaces next activ
 _defaults = {'emacs_tabstops_tabstop': 8,
              'emacs_tabstops_convert_on_save': 'auto',
              'emacs_tabstops_convert_on_load': True,
-             'emacs_tabstops_skip_filetypes': ["Python", "Cython"]}
+             'emacs_tabstops_skip_filetypes': ["Python", "Cython",
+                                               "Makefile", "Makefile.am"]}
 
 
 def plugin_loaded():
@@ -125,6 +129,20 @@ def any_indentation_spaces_exist(view, tabstop):
     except StopIteration:
         return False
 
+def skip_file(view):
+    """Return True if the view is described inemacs_tabstops_skip_filetypes
+
+    Note: Case insensitive
+    """
+    syntax = view.settings().get('syntax').lower()
+    for skip_ft in get_setting(view, "emacs_tabstops_skip_filetypes"):
+        skip_ft = skip_ft.lower()
+        fname = os.path.basename(view.file_name()).lower()
+        if syntax == skip_ft:
+            return True
+        elif fnmatch(fname, skip_ft):
+            return True
+    return False
 
 class FriendlyTextCommand(sublime_plugin.TextCommand):
     _success_msg = ""
@@ -314,10 +332,8 @@ class EmacsTabstopsListener(DynamicListener):
         # print("@pre_save", view.buffer_id())
         settings = view.settings()
 
-        syntax = view.settings().get('syntax').lower()
-        for skip_ft in get_setting(view, "emacs_tabstops_skip_filetypes"):
-            if syntax in skip_ft.lower():
-                return
+        if skip_file(view):
+            return
 
         # decide if we should convert spaces- > tabs before saving
         cos = get_setting(view, "emacs_tabstops_convert_on_save")
@@ -339,10 +355,8 @@ class EmacsTabstopsListener(DynamicListener):
     @staticmethod
     def on_load(view):
         # print("@load", view.buffer_id())
-        syntax = view.settings().get('syntax').lower()
-        for skip_ft in get_setting(view, "emacs_tabstops_skip_filetypes"):
-            if syntax in skip_ft.lower():
-                return
+        if skip_file(view):
+            return
 
         if get_setting(view, "emacs_tabstops_convert_on_load"):
             # print("EmacsTabstops says delay conversion to activated")

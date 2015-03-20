@@ -15,7 +15,7 @@ PREFIX = "_emacs_tabstops"
 S_SCRATCH_HACK = PREFIX + "_scratch_hack"
 S_RESET_HACK = PREFIX + "_reset_hack"
 S_CONVERTED_TO = PREFIX + "_converted_to"  # {'tabs', 'spaces'}
-S_INLINE_TABS = PREFIX + "_inline_tabs"  # {'tabs', 'spaces'}
+S_INLINE_TABS = PREFIX + "_inline_tabs"  # not used
 S_TTS_ON_PS = PREFIX + "_tts_on_ps"  # tabs to spaces on post save flag
 S_TTS_ON_ACTIVATE = PREFIX + "_tts_on_activate"  # run tabs to spaces next activate
 

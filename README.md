@@ -23,7 +23,7 @@ These settings should be in Prefereces or a project file.
     + always: always convert spaces -> tabs on save
     + auto: only convert if tabs -> spaces was previously run for this buffer
     + never: don't convert spaces -> tabs on save
-    If conversion is done, the tabs are replaced with spaces again after the buffer is saved. (Default: 'never')
+    If conversion is done, the tabs are replaced with spaces again after the buffer is saved. (Default: 'auto')
   - `emacs_tabstops_skip_filetypes`: List of file types to ignore when loading/saving. You can still call this plugin by hand for these files. (Default: ['Python', 'Cython', 'Makefile', 'Makefile.am'])
 
 Usage

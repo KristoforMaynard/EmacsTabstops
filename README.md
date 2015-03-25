@@ -7,6 +7,11 @@ By default, this plugin will convert tabs *at the start of lines* to `tabstop` n
 
 This is not a replacement for emacs-like tabstop support in Sublime Text since only tabs at the start of lines are converted. The reason for this is to try keep the transformation invertable. Otherwise, there's no straight forward way to keep track of 8 spaces in a line and 8 spaces that came from a tab character. As it is, if editing a file with mixed tab / space indentation, there's no guarentee the transformation is invertable.
 
+Status
+------
+
+Currently beta quality. Things work well enough for the day-to-day, but don't be surprised by small hiccups.
+
 Settings
 --------
 
@@ -32,4 +37,5 @@ Usage
 Issues
 ------
 
+  - No keybindings for Linux/Windows. If you use these platforms and have a natural key combination, submit a pull request :)
   - If the file changes outside of SublimeText and it gets automatically reloaded, there appears to be no way to detect this and re-convert tabs -> spaces. To work around this you'll have to run <`cmd` + `alt` + `shift` + `tab`> by hand.

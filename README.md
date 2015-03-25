@@ -19,12 +19,12 @@ These settings should be in Prefereces or a project file.
 
   - `emacs_tabstops_tabstop`: integer number of spaces to substitute. (Default: 8)
   - `emacs_tabstops_convert_on_load`: {true, false} Convert tabs -> spaces on load. Note that no conversion is done if there are no tabs in the file. (Default: true)
-  - `emacs_tabstops_convert_on_save`: {'always', 'auto', 'never'}
+  - `emacs_tabstops_convert_on_save`: {'always', 'auto', 'never'} (Default: 'auto')
     + always: always convert spaces -> tabs on save
     + auto: only convert if tabs -> spaces was previously run for this buffer
     + never: don't convert spaces -> tabs on save
 
-    If conversion is done, the tabs are replaced with spaces again after the buffer is saved. (Default: 'auto')
+    If conversion is done, the tabs are replaced with spaces again after the buffer is saved.
   - `emacs_tabstops_skip_filetypes`: List of file types to ignore when loading/saving. You can still call this plugin by hand for these files. (Default: ['Python', 'Cython', 'Makefile', 'Makefile.am'])
 
 Usage

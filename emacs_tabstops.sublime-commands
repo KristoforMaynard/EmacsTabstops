@@ -2,6 +2,6 @@
   { "caption": "EmacsTabstops: Toggle Tabs/Spaces", "command": "emacs_tabstops_toggle" },
   { "caption": "EmacsTabstops: Tabs -> Spaces", "command": "emacs_tabstops_to_spaces" },
   { "caption": "EmacsTabstops: Spaces -> Tabs", "command": "emacs_tabstops_to_tabs" },
-  { "caption": "EmacsTabstops: Save with Spaces", "command": "emacs_tabstops_save_with_spaces" }
+  { "caption": "EmacsTabstops: Save with Spaces", "command": "emacs_tabstops_save_with_spaces" },
   { "caption": "EmacsTabstops: Save with Tabs", "command": "emacs_tabstops_save_with_tabs" }
 ]

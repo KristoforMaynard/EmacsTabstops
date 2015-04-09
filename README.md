@@ -1,11 +1,9 @@
 EmacsTabstops
 =============
 
-SublimeText plugin for dealing with source files that use Emacs' silly "8 spaces becomes a tab" behavior when the indentation level of a file is some other number.
+Better tabstop support for Sublime Text. The whole idea is to enable tabstops to be something other than the indentation tab width. This is invaluable when editing files written in Emacs, where tabstops are 8 spaces, but the indentation tab width might be 2 or 4 spaces.
 
-By default, this plugin will convert tabs *at the start of lines* to `tabstop` number of spaces on load. Then, on save, `tabstop` number of spaces at the start of lines will be replaced with tab characters again. The idea being that the file will look right while you edit, but the tabs -> spaces won't be saved back to the file. This keeps the war between tabs and spaces out of diffs.
-
-This is not a replacement for emacs-like tabstop support in Sublime Text since only tabs at the start of lines are converted. The reason for this is to try keep the transformation invertable. Otherwise, there's no straight forward way to keep track of 8 spaces in a line and 8 spaces that came from a tab character. As it is, if editing a file with mixed tab / space indentation, there's no guarentee the transformation is invertable.
+By default, this plugin will convert all tabs to spaces on load, and convert those regions back to tabs again on save. This behavior lets you edit files with spaces, but keeps the tabs on disk so that whitespace changes don't show up in diffs and the like. To get full emacs behavior where all sets of 8 spaces at the start of a line become tabs, set `emacs_tabstops_all_to_tabs` to true. Conversely, to keep the spaces on save, set `emacs_tabstops_convert_on_save` to "never".
 
 Status
 ------
@@ -25,13 +23,14 @@ These settings should be in Prefereces or a project file.
     + never: don't convert spaces -> tabs on save
 
     If conversion is done, the tabs are replaced with spaces again after the buffer is saved.
+  - `emacs_tabstops_all_to_tabs`: {true, false} When converting to tabs, control whether or not all indentation spaces of tabstop width are converted to tabs. If false, only regions where tabs were converted to spaces are converted back. (Default: false)
   - `emacs_tabstops_skip_filetypes`: List of file types to ignore when loading/saving. You can still call this plugin by hand for these files. (Default: ['Python', 'Cython', 'Makefile', 'Makefile.am'])
 
 Usage
 -----
 
   - Use convert_on_{load,save} settings to do conversions automatically.
-  - Command are available in the pallette as "EmacsTabstops: *"
+  - Commands are available in the pallette as "EmacsTabstops: *"
   - Toggling between tabs and spaces can also be done via the shortcut <`cmd` + `alt` + `tab`>
   - To go only tabs -> spaces, use <`cmd` + `alt` + `shift` + `tab`>
 

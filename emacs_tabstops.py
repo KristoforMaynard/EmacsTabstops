@@ -11,6 +11,8 @@ import sublime_plugin
 _scratch_listener = None  # will be an instance of EmacsTabstopsScratchListener
 _reset_listener = None  # will be an instance of EmacsTabstopsResetListener
 
+TTS_REGION_KEY = "_emacs_tabstops_tabs_now_spaces"
+
 PREFIX = "_emacs_tabstops"
 S_SCRATCH_HACK = PREFIX + "_scratch_hack"
 S_RESET_HACK = PREFIX + "_reset_hack"
@@ -22,6 +24,8 @@ S_TTS_ON_ACTIVATE = PREFIX + "_tts_on_activate"  # run tabs to spaces next activ
 _defaults = {'emacs_tabstops_tabstop': 8,
              'emacs_tabstops_convert_on_save': 'auto',
              'emacs_tabstops_convert_on_load': True,
+             'emacs_tabstops_all_to_tabs': False,
+             'emacs_tabstops_indent_tabs_only': False,
              'emacs_tabstops_skip_filetypes': ["Python", "Cython",
                                                "Makefile", "Makefile.am"]}
 
@@ -111,6 +115,15 @@ def skip_inline(view, point):
 def iter_indentation_tabs(view, advance=True):
     return find_iter(view, r"\t", skip=skip_inline, advance=advance)
 
+def iter_all_tabs(view, advance=True):
+    return find_iter(view, r"\t", advance=advance)
+
+def iter_tabs_intel(view, advance=True):
+    if get_setting(view, "emacs_tabstops_indent_tabs_only"):
+        return iter_indentation_tabs(view, advance=advance)
+    else:
+        return iter_all_tabs(view, advance=advance)
+
 def iter_indentation_spaces(view, tabstop, advance=True):
     s = " " * tabstop
     return find_iter(view, s, skip=skip_inline, advance=advance)
@@ -121,6 +134,19 @@ def any_indentation_tabs_exist(view):
         return True
     except StopIteration:
         return False
+
+def any_tabs_exist(view):
+    try:
+        next(iter_all_tabs(view))
+        return True
+    except StopIteration:
+        return False
+
+def any_tabs_exist_intel(view):
+    if get_setting(view, "emacs_tabstops_indent_tabs_only"):
+        return any_indentation_tabs_exist(view)
+    else:
+        return any_tabs_exist(view)
 
 def any_indentation_spaces_exist(view, tabstop):
     try:
@@ -165,12 +191,27 @@ class EmacsTabstopsToSpaces(FriendlyTextCommand):
 
         if tabstop is None:
             tabstop = get_setting(self.view, "emacs_tabstops_tabstop")
-        s = " " * tabstop
 
         n_found = 0
-        for reg in iter_indentation_tabs(self.view, False):
+        reg_list = []
+        self.view.erase_regions(TTS_REGION_KEY)
+        # for reg in iter_indentation_tabs(self.view, False):
+        for reg in iter_tabs_intel(self.view, False):
+            # look backward for spaces to change how many spaces this tabstop
+            # becomes
+            col = self.view.rowcol(reg.b)[1] - 1  # 0 based column?
+            this_tabstop = tabstop - (col % tabstop)
+            s = " " * (this_tabstop)
+            # make a region for when we want to toggle back to tabs
+            _reg = sublime.Region(reg.a, reg.a + this_tabstop)
+            _reg.xpos = this_tabstop
+            reg_list += [_reg]
+            # do the replace
             self.view.replace(edit, reg, s)
             n_found += 1
+
+        self.view.add_regions(TTS_REGION_KEY, reg_list,
+                              "", "", sublime.HIDDEN | sublime.PERSISTENT)
 
         if n_found:
             settings.set(S_CONVERTED_TO, "spaces")
@@ -181,6 +222,7 @@ class EmacsTabstopsToSpaces(FriendlyTextCommand):
 
 class EmacsTabstopsToTabs(FriendlyTextCommand):
     def _friendly_run(self, edit, tabstop=None):
+        # print("converting to tabs")
         settings = self.view.settings()
         was_clean = not self.view.is_dirty()
         ttts = "translate_tabs_to_spaces"
@@ -189,9 +231,19 @@ class EmacsTabstopsToTabs(FriendlyTextCommand):
 
         tabstop = get_setting(self.view, "emacs_tabstops_tabstop")
         n_found = 0
-        for reg in iter_indentation_spaces(self.view, tabstop, False):
-            self.view.replace(edit, reg, '\t')
-            n_found += 1
+
+        # first, convert regions that we converted with tabs -> spaces
+        for reg in list(self.view.get_regions(TTS_REGION_KEY))[::-1]:
+            if self.view.substr(reg) == " " * int(reg.xpos):
+                n_found += 1
+                self.view.replace(edit, reg, '\t')
+        self.view.erase_regions(TTS_REGION_KEY)
+
+        # now go back and do the remaining tabstops if so requested
+        if get_setting(self.view, "emacs_tabstops_all_to_tabs"):
+            for reg in iter_indentation_spaces(self.view, tabstop, False):
+                self.view.replace(edit, reg, '\t')
+                n_found += 1
 
         if n_found:
             settings.set(S_CONVERTED_TO, "tabs")
@@ -206,7 +258,7 @@ class EmacsTabstopsToggle(sublime_plugin.TextCommand):
     def run(self, edit):
         tabstop = get_setting(self.view, "emacs_tabstops_tabstop")
 
-        if any_indentation_tabs_exist(self.view):
+        if any_tabs_exist_intel(self.view):
             # print("to spaces")
             self.view.run_command("emacs_tabstops_to_spaces",
                                   {"tabstop": tabstop})

@@ -27,7 +27,8 @@ _defaults = {'emacs_tabstops_tabstop': 8,
              'emacs_tabstops_all_to_tabs': False,
              'emacs_tabstops_indent_tabs_only': False,
              'emacs_tabstops_skip_filetypes': ["Python", "Cython",
-                                               "Makefile", "Makefile.am"]}
+                                               "Makefile", "Makefile.am",
+                                               "*.sublime-*"]}
 
 
 def plugin_loaded():
@@ -164,7 +165,7 @@ def skip_file(view):
     for skip_ft in get_setting(view, "emacs_tabstops_skip_filetypes"):
         skip_ft = skip_ft.lower()
         fname = os.path.basename(view.file_name()).lower()
-        if syntax == skip_ft:
+        if skip_ft in syntax:
             return True
         elif fnmatch(fname, skip_ft):
             return True

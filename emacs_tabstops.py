@@ -187,6 +187,7 @@ class FriendlyTextCommand(sublime_plugin.TextCommand):
 
 class EmacsTabstopsToSpaces(FriendlyTextCommand):
     def _friendly_run(self, edit, tabstop=None):
+        # raise RuntimeError()
         settings = self.view.settings()
         was_clean = not self.view.is_dirty()
 
@@ -356,7 +357,8 @@ class EmacsTabstopsResetListener(DynamicListener):
         # print("@modified (reset hack)", view.id(), view.buffer_id())
         if view.settings().get(S_RESET_HACK, None):
             view.settings().erase(S_RESET_HACK)
-            view.run_command("emacs_tabstops_to_spaces")
+            if not skip_file(view):
+                view.run_command("emacs_tabstops_to_spaces")
             self.remove_handler("on_modified")
 
     def on_text_command(self, view, command_name, args):  # pylint: disable=unused-argument
